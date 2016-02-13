@@ -27,7 +27,6 @@ main(){
 	do{
 		printMenu(&choice);
 		wordOutput[0] = '\0';					//to make sure string is empty everytime is is used
-
 		switch(choice){
 			case 1: printf("\n\nEnter Number (<= 100000): ");
 					scanf("%d", &input);
@@ -36,6 +35,7 @@ main(){
 						printf("Input to big!");
 						break;
 					}else{
+						wordOutput[0] = '\0';					//to make sure string is empty everytime is is used
 						strcat(wordOutput,numToWords(input));
 						printf("Output: %s\n\n", wordOutput);
 					}
@@ -59,8 +59,7 @@ main(){
 						printf("Enter Position: ");
 						scanf("%d", &position);
 						getchar();
-						strcat(wordOutput,numberDelimited(input,delimiter,position));
-						printf("\nOutput: %s\n",wordOutput);
+						numberDelimited(input,delimiter,position);					
 					}
 					break;
 			case 5: //exit
@@ -121,7 +120,7 @@ char* numToWords(int input){
 //========================================================================================================================//
 
 char* convertToWords(int x,int y){
-	char primary[9][10] = {" one"," two","three"," four"," five"," six"," seven"," eight"," nine"};
+	char primary[9][10] = {" one"," two"," three"," four"," five"," six"," seven"," eight"," nine"};
 	char secondary[9][10] = {" ten"," twenty"," thirty"," forty"," fifty"," sixty"," seventy"," eighty"," ninety"};
 	char tens[10][10] = {" ten"," eleven"," twelve"," thirteen"," fourteen"," fifteen"," sixteen"," seventeen"," eighteen"," nineteen"};
 	char *pointer;
@@ -233,7 +232,7 @@ int requestPrint(char find[]){
 
 //========================================================================================================================//
 
-char* numberDelimited(int input,char delimiter, int position){
+void numberDelimited(int input,char delimiter, int position){
 	char toPrint[8],n[8];
 	int delimitFlag = 0,i;
 	toStringThisNumber(input,n);			//convert integer input to string and store it to n
@@ -248,7 +247,8 @@ char* numberDelimited(int input,char delimiter, int position){
 		}else toPrint[i+1] = n[i];			
 	}
 	toPrint[i] = '\0';						//end of string
-	return toPrint;
+	printf("\nNumber Delimited is /%s/",toPrint);
+	return;
 }
 
 //========================================================================================================================//
