@@ -1,6 +1,8 @@
 #include<stdio.h>
 #include<string.h>
 
+
+//number delimiter
 void numberDelimited(int,char,int);
 void toStringThisNumber(int,char[]);
 
@@ -12,6 +14,9 @@ char* convertToWords(int, int);
 int convertToNumber(char[][10],int,int);
 int requestPrint(char[]);
 int wordsToNum(char*);
+
+//convert to currency
+void convertToCurrency(char[],char[]);
 
 //misc functions
 int checkInput(int);
@@ -45,21 +50,22 @@ main(){
 					numberOutput = wordsToNum(words1);
 					printf("\nOutput: %d\n", numberOutput);
 					break;
-			case 3: break;
+			case 3: printf("\n\nEnter Number in Words (lower case) : ");
+					fgets(words1,256,stdin);
+					printf("\n\nJPY/PHP/USD: ");
+					fgets(words2,256,stdin);
+					convertToCurrency(words1,words2);
+					break;
 			case 4: printf("\n\nEnter Number (<= 100000): ");
 					scanf("%d", &input);
 					getchar();
-					if(checkInput(input) == 1){
-						printf("Input to big!");
-						break;
-					}else{
-						printf("Enter Delimiter (single character): ");
-						scanf("%c", &delimiter);
-						getchar();
-						printf("Enter Position: ");
-						scanf("%d", &position);
-						getchar();
-						numberDelimited(input,delimiter,position);					
+					printf("Enter Delimiter (single character): ");
+					scanf("%c", &delimiter);
+					getchar();
+					printf("Enter Position: ");
+					scanf("%d", &position);
+					getchar();
+					numberDelimited(input,delimiter,position);					
 					}
 					break;
 			case 5: //exit
@@ -82,13 +88,23 @@ void printMenu(int *choice){
 	printf("\n\n\tI===============================I\n");
 	printf("\tI [1] Numbers to Words          I\n");
 	printf("\tI [2] Words to Numbers          I\n");
-	printf("\tI [3] Number to Words           I\n");
+	printf("\tI [3] Convert to Currency       I\n");
 	printf("\tI [4] Delimit                   I\n");
 	printf("\tI [5] Exit                      I\n");
 	printf("\tI===============================I\n");
 	printf("   Choice: ");
 	scanf("%d", choice);	
 	getchar();
+}
+
+//========================================================================================================================//
+
+void convertToCurrency(char wordA[256], char wordB[256]){
+	int x =wordsToNum(wordA);
+	wordB[3] = '\0';
+	if (x <= 1000000) printf("\nOutput: %s%d\n",wordB, x);
+	else printf("\nNumber is too big!\n");
+	return;
 }
 
 //========================================================================================================================//
@@ -160,6 +176,7 @@ int wordsToNum(char input[]){
 	int wordCount=0;
 	int checker = 0;
 	int accumulator=0;
+	
 	for(i = 0 ; i < strlen(input)+1 ; i++){								//chops the whole input into
 		if(input[i] == ' ' || input[i] == '\0'){						//separate words and stored into a 2d array
 			if(input[i] == ' ') tempStorage[iterator] = '\0';
@@ -235,8 +252,13 @@ int requestPrint(char find[]){
 void numberDelimited(int input,char delimiter, int position){
 	char toPrint[8],n[8];
 	int delimitFlag = 0,i;
-	toStringThisNumber(input,n);			//convert integer input to string and store it to n
 	
+	if(input >1000000){
+		printf("\nNumber is too big!\n");
+		return;
+	}
+	
+	toStringThisNumber(input,n);			//convert integer input to string and store it to n
 	for(i=0 ; i<strlen(n)+1 ; i++){
 		if(delimitFlag == 0){				
 			if(i == strlen(n)-position){	//delimit flag turns on when right position for delimiter is encountered
@@ -247,7 +269,7 @@ void numberDelimited(int input,char delimiter, int position){
 		}else toPrint[i+1] = n[i];			
 	}
 	toPrint[i] = '\0';						//end of string
-	printf("\nNumber Delimited is /%s/",toPrint);
+	printf("\nNumber Delimited is %s",toPrint);
 	return;
 }
 
