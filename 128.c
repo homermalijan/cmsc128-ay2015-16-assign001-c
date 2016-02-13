@@ -2,18 +2,19 @@
 #include<string.h>
 
 void printMenu(int *);
-void numToWords(int);
-void convertToWords(int, int);
+char* numToWords(int);
+char* convertToWords(int, int);
 void wordsToNum(char*);
 int convertToNumber(char[][10],int,int);
 void numberDelimited(int,char,int);
 void toStringThisNumber(int,char[]);
-int requestPrint(char[],int);
+int requestPrint(char[]);
 
 main(){
-	int choice=0;
+	int choice=0,numberOutput=0;
 	int input=0;
 	char delimiter='\0';
+	char wordOutput[256];
 	int position=0;
 	char words1[256],words2[256];
 	do{
@@ -22,7 +23,8 @@ main(){
 			case 1: printf("\n\nEnter Number (<= 100000): ");
 					scanf("%d", &input);
 					getchar();
-					numToWords(input);
+					strcat(wordOutput,numToWords(input));
+					printf("Output: %s\n\n", wordOutput);
 					break;
 			case 2: printf("\n\nEnter Number in Words (lower case) : ");
 					fgets(words1,256,stdin);
@@ -68,51 +70,63 @@ void printMenu(int *choice){
 
 //========================================================================================================================//
 
-void numToWords(int input){
+char* numToWords(int input){
 	int i = 0;
+	char *pointer;
+	char output[256] = "\0";
 	if(input>1000000){									//number is too big
 		printf("\nNumber too big!\n");
 		return;
 	}
-	if(input == 0) printf("\n Zero");					//for zero input
+	if(input == 0) strcpy(output,"zero");					//for zero input
 	for(i = 1000000 ; i > 0 ; i = i/1000){				//divides the numbers into 3s
 		switch(i){
-			case 1000000: 	if(((input - input % i)/i) > 0) convertToWords((input - input % i)/i,1);	//million
+			case 1000000: 	if(((input - input % i)/i) > 0) strcat(output, convertToWords((input - input % i)/i,1));		//million
 							break;	
-			case 1000:		if(((input - input % i)/i) > 0) convertToWords((input - input % i)/i,2);	//thousands
+			case 1000:		if(((input - input % i)/i) > 0) strcat(output, convertToWords((input - input % i)/i,2));		//thousands
 							break;
-			case 1:			if(((input - input % i)/i) > 0) convertToWords((input - input % i)/i,3);	//hundreds
+			case 1:			if(((input - input % i)/i) > 0) strcat(output, convertToWords((input - input % i)/i,3));		//hundreds
 							break;
 		}
 		input = input%i;								//update current number
 	}
+	pointer = output;
+	return pointer;
 }
 
 //========================================================================================================================//
 
-void convertToWords(int x,int y){
-	char primary[9][6] = {"One","Two","Three","Four","Five","Six","Seven","Eight","Nine"};
-	char secondary[9][8] = {"Ten","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"};
-	char tens[10][9] = {"Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"};
-
-	if(x/100 != 0) printf(" %s hundred", primary[(x/100)-1]);			//hundreds place
+char* convertToWords(int x,int y){
+	char primary[9][10] = {" one"," two","three"," four"," five"," six"," seven"," eight","nine"};
+	char secondary[9][10] = {" ten"," twenty"," thirty"," forty"," fifty"," sixty"," seventy"," eighty"," ninety"};
+	char tens[10][10] = {" ten"," eleven"," twelve"," thirteen"," fourteen"," fifteen"," sixteen"," seventeen"," eighteen"," nineteen"};
+	char *pointer;
+	char output[256]="";
+	if(x/100 != 0) {
+		strcat(output,primary[(x/100)-1]);
+		strcat(output," hundred");	
+	}
+	
 	x = x % 100;														//print only if not zero
 
 	if(x/10 != 0){														//tens place print only if not zero
 		if(x/10 != 1){													//checks for 11-19 (#pabebe case)
-			printf(" %s", secondary[(x/10)-1]);							//prints tens digit
+			strcat(output, secondary[(x/10)-1]);						//prints tens digit
 			x = x % 10;
-			if(x!=0) printf(" %s", primary[x-1]);						//prints one digit
-		}else printf(" %s", tens[(x%10)]);								//if tens is zero print only ones digit
-	}else printf(" %s", primary[(x%10)-1]);								//print 11-19
+			if(x!=0) strcat(output, primary[x-1]);						//prints one digit
+		}else strcat(output, tens[(x%10)]);
+	}else strcat(output, primary[(x%10)-1]);	
 	
 	switch(y){															//print extension
-		case 1: printf(" Million");
+		case 1: strcat(output," million");	
 				break;
-		case 2: printf(" Thousand");
+		case 2: strcat(output," thousand");	
 				break;
 	}
-	return;
+		
+	printf("\noutput is : %s\n", output);
+	pointer = output;
+	return pointer;
 }
 
 //========================================================================================================================//
@@ -156,7 +170,8 @@ void wordsToNum(char input[]){
 		}
 	}
 	
-	printf("%d",accumulator);
+	if(accumulator > 1000000) printf("\nNumber too big!\n");
+	else printf("\nOutput: %d\n",accumulator);
 
 	return;
 }
@@ -164,24 +179,17 @@ void wordsToNum(char input[]){
 //========================================================================================================================//
 
 int convertToNumber(char toConvert[][10],int wordCount,int amount){
-	char primary[9][6] = {"one","two","three","four","five","six","seven","eight","nine"};
-	char secondary[9][8] = {"ten","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"};
-	char tens[10][9] = {"ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"};
 	int i;
 	int accumulator = 0;
-	printf("\nword count is %d\n", wordCount);	
 	
-	if(wordCount == 1){
-		accumulator = requestPrint(toConvert[0],1);
-	}
+	if(wordCount == 1) accumulator = requestPrint(toConvert[0]);
 	else{
 		for(i = 0 ; i < wordCount ; i++){
-			if(i == 0) accumulator += requestPrint(toConvert[0],1);
+			if(i == 0) accumulator += requestPrint(toConvert[0]);
 			else if(strcmp(toConvert[i],"hundred")==0) accumulator *= 100;
-			else accumulator += requestPrint(toConvert[i],1); 
+			else accumulator += requestPrint(toConvert[i]); 
 		}
 	}
-	printf("\nyey%d\n",accumulator);
 
 	if(amount == 1) return accumulator*1000000;
 	else if(amount == 2) return accumulator * 1000; 
@@ -190,34 +198,14 @@ int convertToNumber(char toConvert[][10],int wordCount,int amount){
 
 //========================================================================================================================//
 
-int requestPrint(char find[], int type){
+int requestPrint(char find[]){
 	char primary[9][6] = {"one","two","three","four","five","six","seven","eight","nine"};
 	char secondary[9][8] = {"ten","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"};
 	char tens[10][9] = {"ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"};
 	int i;
-	if(type == 1){
-		for(i=0;i<9;i++){
-			if(strcmp(find,primary[i]) == 0){
-				printf("\nA %d\n", i+1);
-				return i+1;
-			}
-
-		}
-		for(i=0;i<9;i++){
-			if(strcmp(find,secondary[i]) == 0){
-				printf("\nB %d\n", ((i+1)*10));
-				return ((i+1)*10);
-			}
-
-		}
-		for(i=0;i<9;i++){
-			if(strcmp(find,secondary[i]) == 0){
-				printf("\nB %d\n", i+10);
-				return i+10;
-			}
-		}
-	}
-	
+		for(i=0;i<9;i++) if(strcmp(find,primary[i]) == 0) return i+1;
+		for(i=0;i<9;i++) if(strcmp(find,secondary[i]) == 0)	return ((i+1)*10);
+		for(i=0;i<9;i++) if(strcmp(find,secondary[i]) == 0) return i+10;
 	return 1;
 }
 
