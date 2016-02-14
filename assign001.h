@@ -22,8 +22,9 @@ void printMenu(int *);
 //========================================================================================================================//
 
 void convertToCurrency(char wordA[256], char wordB[256]){
-	int x =wordsToNum(wordA);											//reuse wordsToNum function to convert
+	int x = wordsToNum(wordA);											//reuse wordsToNum function to convert
 	wordB[3] = '\0';
+	if (x == -1) return;
 	
 	if (x <= 1000000){
 		if(strcasecmp(wordB,"PHP")==0) printf("Output: PHP");			//check currency
@@ -106,7 +107,7 @@ int wordsToNum(char input[]){
 	
 	if(accumulator > 1000000){
 		printf("\nNumber too big!\n");
-		return 0;
+		return -1;
 	}
 	return accumulator;
 }
